@@ -1,39 +1,70 @@
 <!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>FATYAK Shell</title><link rel="icon" href="logo.svg">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu:wght@400;500;700&family=Ubuntu+Mono&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
 <style>
-:root{--aub:#2C001E;--plum:#5E2750;--org:#E95420;--warm:#AEA79F;--bg:#fff;--ink:#333}
-@media(prefers-color-scheme:dark){:root{--bg:#1d0015;--ink:#eee}}
-*{box-sizing:border-box}body{margin:0;font:17px/1.6 Ubuntu,system-ui,sans-serif;background:var(--bg);color:var(--ink)}
-nav{background:var(--aub);display:flex;align-items:center;gap:28px;padding:12px 6vw;color:#fff;position:sticky;top:0}
-nav img{height:36px}nav b{font-size:20px;margin-right:auto}nav a{color:#fff;text-decoration:none;opacity:.85}nav a:hover{opacity:1}
-.btn{background:var(--org);color:#fff;padding:10px 22px;border-radius:4px;text-decoration:none;font-weight:500;display:inline-block}
-.btn.o{background:none;border:1px solid #fff}
-header{background:linear-gradient(135deg,var(--aub),var(--plum) 60%,#77216F);color:#fff;padding:90px 6vw;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
-h1{font-size:clamp(36px,5vw,58px);line-height:1.1;margin:0 0 16px;font-weight:500}header p{max-width:46ch;opacity:.9}
-.term{background:#1a0012;border-radius:8px;box-shadow:0 20px 50px #0008;font:15px/1.5 'Ubuntu Mono',monospace;overflow:hidden}
-.term i{display:flex;gap:7px;background:#3a2133;padding:10px 14px}.term i s{width:12px;height:12px;border-radius:50%;background:var(--org)}.term i s+s{background:#AEA79F}.term i s+s+s{background:#77216F}
-.term pre{margin:0;padding:18px;color:#d8f5c7;white-space:pre-wrap}.term em{color:var(--org);font-style:normal}
-section{padding:72px 6vw;max-width:1200px;margin:auto}h2{font-size:32px;font-weight:500;margin:0 0 32px}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:24px}
-.card{border-top:3px solid var(--org);padding:18px 0}.card h3{margin:0 0 6px;font-weight:500}
-code{background:#2C001E;color:#fff;padding:3px 8px;border-radius:4px;font-family:'Ubuntu Mono',monospace}
-footer{background:var(--aub);color:var(--warm);padding:32px 6vw;display:flex;justify-content:space-between;flex-wrap:wrap;gap:12px}
-@media(max-width:800px){header{grid-template-columns:1fr}nav a:not(.btn){display:none}}
+:root{--aub:#300A24;--bar:#3E3E3E;--org:#E95420;--txt:#EEEEEC;--grn:#8AE234;--blu:#729FCF;--dim:#AEA79F}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:linear-gradient(135deg,#2C001E,#5E2750 55%,#77216F);display:flex;align-items:center;justify-content:center;padding:3vmin;font-family:'Ubuntu Mono',monospace}
+.win{width:100%;max-width:1100px;height:100%;max-height:760px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:0 30px 80px #000a}
+.bar{background:var(--bar);color:#ddd;display:flex;align-items:center;padding:8px 14px;font:500 14px Ubuntu,sans-serif;gap:10px}
+.bar img{height:18px}.bar span{margin:0 auto}.dots{display:flex;gap:8px}.dots i{width:14px;height:14px;border-radius:50%;background:#6a6a6a}.dots i:last-child{background:var(--org)}
+.term{flex:1;background:var(--aub);color:var(--txt);padding:16px 18px;overflow:auto;font-size:17px;line-height:1.45;cursor:text}
+pre{margin:0;white-space:pre-wrap;word-break:break-word;font:inherit}
+.p{color:var(--grn);font-weight:700}.pb{color:var(--blu);font-weight:700}.o{color:var(--org)}.d{color:var(--dim)}
+.row{display:flex;gap:8px}.row input{flex:1;background:none;border:0;outline:0;color:var(--txt);font:inherit;caret-color:var(--org);min-width:0}
+a{color:var(--blu)}@media(max-width:600px){.term{font-size:14px}body{padding:0}.win{border-radius:0;max-height:none}}
 </style></head><body>
-<nav><img src="logo.svg" alt="FATYAK logo"><b>FATYAK</b><a href="#features">Features</a><a href="#start">Quick start</a><a class="btn" href="https://github.com/FATYAK/FATYAK-Shell">GitHub</a></nav>
-<header><div><h1>Every language. One PowerShell window.</h1><p>FATYAK Shell runs Python, JavaScript, TypeScript, Java, Go, PHP, C and C++ locally. Free, no API, and nothing to install: each runtime is a portable ZIP.</p><p><a class="btn" href="#start">Get started</a> <a class="btn o" href="https://github.com/FATYAK/FATYAK-Shell">View source</a></p></div>
-<div class="term"><i><s></s><s></s><s></s></i><pre><em>fatyak</em> &gt; Run code
-[1] Python 3.12      ● ready
-[2] JavaScript       ○ downloads on first use
-[5] Go 1.23          ○ downloads on first use
-
-Hello from Python
-exit code: 0</pre></div></header>
-<section id="features"><h2>What you get</h2><div class="grid">
-<div class="card"><h3>Zero install</h3><p>Runtimes live in one folder in your user profile. No installer, no PATH or registry changes. Delete the folder to remove everything.</p></div>
-<div class="card"><h3>8 languages</h3><p>JavaScript, TypeScript, Java, Go, PHP, C and C++ download as portable ZIPs the first time you use them.</p></div>
-<div class="card"><h3>Private and offline</h3><p>Your code never leaves your PC. After the first download, everything works offline.</p></div>
-<div class="card"><h3>One file</h3><p>A single script. Open source under the MIT license.</p></div></div></section>
-<section id="start"><h2>Quick start</h2><p>Open PowerShell and run:</p><p><code>powershell -ExecutionPolicy Bypass -File .\FATYAK-Shell.ps1</code></p></section>
-<footer><span>© 2026 FATYAK. MIT License.</span><span>Built with PowerShell</span></footer></body></html>
+<div class="win"><div class="bar"><div class="dots"><i></i><i></i><i></i></div><span><img src="logo.svg" alt="">&nbsp;fatyak@shell: ~</span></div>
+<div class="term" id="t"><pre id="o"></pre>
+<div class="row"><span class="p">fatyak@shell</span><span>:</span><span class="pb">~</span><span>$</span><input id="i" autofocus autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal input"></div></div></div>
+<script>
+const o=document.getElementById('o'),i=document.getElementById('i'),t=document.getElementById('t');
+const LOGO=` ███████╗ █████╗ ████████╗██╗   ██╗ █████╗ ██╗  ██╗
+ ██╔════╝██╔══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝
+ █████╗  ███████║   ██║    ╚████╔╝ ███████║█████╔╝
+ ██╔══╝  ██╔══██║   ██║     ╚██╔╝  ██╔══██║██╔═██╗
+ ██║     ██║  ██║   ██║      ██║   ██║  ██║██║  ██╗
+ ╚═╝     ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝`;
+const GH='https://github.com/FATYAK/FATYAK-Shell';
+const LANGS=[['python','Python 3.12','10 MB'],['node','JavaScript (Node.js 22)','30 MB'],['deno','TypeScript (Deno)','40 MB'],['java','Java 21','190 MB'],['go','Go 1.23','75 MB'],['php','PHP 8.3','30 MB'],['c','C (Zig)','80 MB'],['cpp','C++ (Zig)','shared']];
+const C={
+ help:()=>`<span class="o">Commands</span>
+  about      what FATYAK Shell is
+  langs      supported languages
+  install    how to run it on Windows
+  demo       sample session
+  github     open the repository
+  banner     show the logo
+  clear      clear the screen`,
+ about:()=>`FATYAK Shell runs Python, JavaScript, TypeScript, Java, Go, PHP, C and C++
+from one PowerShell window. Free, local, no API, nothing to install:
+each runtime is a portable ZIP downloaded once. Developer: <span class="o">FATYAK</span>`,
+ langs:()=>LANGS.map(l=>`  <span class="p">${l[0].padEnd(8)}</span>${l[1].padEnd(26)}<span class="d">${l[2]}</span>`).join('\n'),
+ install:()=>`<span class="d"># in PowerShell</span>
+git clone ${GH}.git
+cd FATYAK-Shell
+powershell -ExecutionPolicy Bypass -File .\\FATYAK-Shell.ps1`,
+ demo:()=>`<span class="p">fatyak</span> &gt; Run code &gt; [1] Python 3.12
+print("Hello from FATYAK")
+:run
+Hello from FATYAK
+<span class="d">exit code: 0</span>`,
+ github:()=>{open(GH,'_blank','noopener');return `Opening <a href="${GH}" target="_blank" rel="noopener">${GH}</a>`},
+ banner:()=>`<span class="o">${LOGO}</span>\n<span class="d">  S H E L L  ·  local, free, no API  ·  by FATYAK</span>`,
+ clear:()=>{o.innerHTML='';return null}
+};
+C.ls=C.langs;C['?']=C.help;
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+const out=h=>{o.insertAdjacentHTML('beforeend',h+'\n');t.scrollTop=t.scrollHeight};
+const hist=[];let hi=0;
+function run(v){out(`<span class="p">fatyak@shell</span>:<span class="pb">~</span>$ ${esc(v)}`);const c=v.trim().toLowerCase();if(!c)return;
+ hist.push(v);hi=hist.length;const f=C[c];const r=f?f():`${esc(c)}: command not found. Type <span class="o">help</span>.`;if(r!==null)out(r+'\n')}
+i.addEventListener('keydown',e=>{
+ if(e.key==='Enter'){run(i.value);i.value=''}
+ else if(e.key==='ArrowUp'&&hi>0){i.value=hist[--hi];e.preventDefault()}
+ else if(e.key==='ArrowDown'){i.value=hist[++hi]||'';if(hi>hist.length)hi=hist.length}
+ else if(e.key==='Tab'){e.preventDefault();const m=Object.keys(C).filter(k=>k.startsWith(i.value)&&i.value);if(m.length===1)i.value=m[0]}
+ else if(e.key==='l'&&e.ctrlKey){e.preventDefault();C.clear()}});
+t.addEventListener('click',()=>{if(!getSelection().toString())i.focus()});
+out(C.banner()+'\n');out('Welcome to FATYAK Shell. Type <span class="o">help</span> to begin.\n');
+</script></body></html>
