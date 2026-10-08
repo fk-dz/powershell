@@ -1,70 +1,1094 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FATYAK Shell</title><link rel="icon" href="logo.svg">
-<link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&family=Ubuntu:wght@500&display=swap" rel="stylesheet">
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FATYAK RADAR — منظومة رصد الأمواج الكهرومغناطيسية</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 <style>
-:root{--aub:#300A24;--bar:#3E3E3E;--org:#E95420;--txt:#EEEEEC;--grn:#8AE234;--blu:#729FCF;--dim:#AEA79F}
-*{box-sizing:border-box}html,body{height:100%;margin:0}
-body{background:linear-gradient(135deg,#2C001E,#5E2750 55%,#77216F);display:flex;align-items:center;justify-content:center;padding:3vmin;font-family:'Ubuntu Mono',monospace}
-.win{width:100%;max-width:1100px;height:100%;max-height:760px;display:flex;flex-direction:column;border-radius:10px;overflow:hidden;box-shadow:0 30px 80px #000a}
-.bar{background:var(--bar);color:#ddd;display:flex;align-items:center;padding:8px 14px;font:500 14px Ubuntu,sans-serif;gap:10px}
-.bar img{height:18px}.bar span{margin:0 auto}.dots{display:flex;gap:8px}.dots i{width:14px;height:14px;border-radius:50%;background:#6a6a6a}.dots i:last-child{background:var(--org)}
-.term{flex:1;background:var(--aub);color:var(--txt);padding:16px 18px;overflow:auto;font-size:17px;line-height:1.45;cursor:text}
-pre{margin:0;white-space:pre-wrap;word-break:break-word;font:inherit}
-.p{color:var(--grn);font-weight:700}.pb{color:var(--blu);font-weight:700}.o{color:var(--org)}.d{color:var(--dim)}
-.row{display:flex;gap:8px}.row input{flex:1;background:none;border:0;outline:0;color:var(--txt);font:inherit;caret-color:var(--org);min-width:0}
-a{color:var(--blu)}@media(max-width:600px){.term{font-size:14px}body{padding:0}.win{border-radius:0;max-height:none}}
-</style></head><body>
-<div class="win"><div class="bar"><div class="dots"><i></i><i></i><i></i></div><span><img src="logo.svg" alt="">&nbsp;fatyak@shell: ~</span></div>
-<div class="term" id="t"><pre id="o"></pre>
-<div class="row"><span class="p">fatyak@shell</span><span>:</span><span class="pb">~</span><span>$</span><input id="i" autofocus autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="terminal input"></div></div></div>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#150a10; --bg-deep:#10060c; --panel:#1e0e17; --panel-2:#251120; --panel-3:#2d1524;
+  --line:#381a29; --line-2:#4a2135;
+  --ink:#f2e7ed; --muted:#b18ea0; --faint:#7c5c6d;
+  --orange:#e95420; --orange-2:#ff8a54;
+  --plum:#772953; --plum-2:#c0619b;
+  --ok:#2aa15f; --warn:#d9a12b; --crit:#cf4a58;
+  --mono:'IBM Plex Mono',ui-monospace,monospace;
+  --sans:'IBM Plex Sans Arabic',sans-serif;
+}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--sans);display:grid;grid-template-rows:52px minmax(0,1fr) auto 36px;overflow:hidden}
+.num{direction:ltr;unicode-bidi:isolate;display:inline-block}
+b{font-weight:700}
+::-webkit-scrollbar{width:8px;height:8px}
+::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:4px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ===== الشريط العلوي ===== */
+#topbar{display:flex;align-items:center;gap:18px;padding:0 16px;background:var(--bg-deep);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:11px}
+.brand svg{width:38px;height:38px;display:block}
+.lp{animation:lpulse 2.4s ease-in-out infinite}
+@keyframes lpulse{50%{opacity:.3}}
+.brand-name{font-family:var(--mono);font-weight:700;font-size:17px;letter-spacing:.2em;color:var(--ink)}
+.brand-sub{display:block;font-family:var(--mono);font-size:8px;letter-spacing:.26em;color:var(--faint);margin-top:2px}
+.top-mid{flex:1;text-align:center;font-size:12px;color:var(--muted)}
+.top-mid .sys{font-family:var(--mono);font-size:10px;color:var(--orange-2);border:1px solid var(--line-2);border-radius:3px;padding:1px 6px;margin-inline-end:8px}
+.top-end{display:flex;align-items:center;gap:14px}
+.badge{display:flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;border:1px solid var(--line-2);border-radius:4px;padding:4px 9px;color:var(--muted)}
+.badge .dot{width:7px;height:7px;border-radius:50%;background:var(--faint)}
+.badge[data-m="live"]{color:var(--ok);border-color:rgba(42,161,95,.4)}
+.badge[data-m="live"] .dot{background:var(--ok);animation:blip 1.6s ease-in-out infinite}
+.badge[data-m="sim"]{color:var(--orange-2);border-color:rgba(233,84,32,.45)}
+.badge[data-m="sim"] .dot{background:var(--orange)}
+@keyframes blip{50%{opacity:.35}}
+.clockbox{text-align:left}
+#clock{font-family:var(--mono);font-size:13px;font-weight:600}
+#clockLocal{display:block;font-family:var(--mono);font-size:9px;color:var(--faint)}
+#lastSync{font-family:var(--mono);font-size:10px;color:var(--faint)}
+#lastSync.stale{color:var(--warn)}
+
+/* ===== الشبكة الرئيسية ===== */
+main{display:grid;grid-template-columns:340px minmax(0,1fr);gap:14px;padding:14px;min-height:0}
+aside{display:flex;flex-direction:column;gap:10px;min-height:0}
+
+/* المقاييس */
+.meter{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.m-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.m-name{font-size:11.5px;font-weight:600;color:var(--muted)}
+.m-code{font-family:var(--mono);font-size:9px;color:var(--faint);letter-spacing:.06em}
+.m-val{display:flex;align-items:center;gap:10px}
+.big{font-family:var(--mono);font-size:27px;font-weight:600;line-height:1.1}
+.pill{font-family:var(--mono);font-size:13px;font-weight:700;border:1px solid;border-radius:5px;padding:2px 8px}
+.m-unit{font-size:9.5px;color:var(--faint);margin:4px 0 9px}
+.scale{margin-top:2px}
+.scale-track{position:relative;display:flex;height:8px;border-radius:3px;overflow:visible}
+.scale-track i{flex:1}
+.scale-track i:first-child{border-radius:3px 0 0 3px}
+.scale-track i:last-child{border-radius:0 3px 3px 0}
+.scale-mark{position:absolute;top:-3px;bottom:-3px;width:2.5px;background:var(--ink);left:50%;transition:left .6s cubic-bezier(.3,.9,.3,1),background .6s;box-shadow:0 0 0 1px rgba(0,0,0,.5)}
+.scale-lbls{display:flex;font-family:var(--mono);font-size:8.5px;color:var(--faint);margin-top:5px}
+.scale-lbls span{flex:1}
+.kp-row{display:flex;align-items:center;gap:12px}
+#kpCv{flex:1;min-width:0}
+.mag-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+#magDelta{font-family:var(--mono);font-size:10px;color:var(--faint)}
+#magSpark{width:100%;height:26px;display:block;margin-top:6px}
+
+/* سجل الرصد */
+.log-block{flex:1;display:flex;flex-direction:column;min-height:0;background:var(--bg-deep);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.log-head{display:flex;align-items:center;gap:8px;padding:8px 12px;border-bottom:1px solid var(--line);font-size:11px;font-weight:600;color:var(--muted)}
+.log-head .cnt{margin-inline-start:auto;font-family:var(--mono);font-size:9.5px;color:var(--faint);font-weight:400}
+.log-head .cnt b{color:var(--orange-2)}
+#log{flex:1;overflow-y:auto;padding:8px 12px;font-family:var(--mono);font-size:10.5px;line-height:1.85}
+#log .ln{color:var(--muted);animation:lin .35s ease}
+@keyframes lin{from{opacity:0;transform:translateY(3px)}}
+#log .lt{color:var(--faint)}
+#log .ok{color:var(--ok)} #log .warn{color:var(--warn)} #log .crit{color:var(--crit)}
+#log .flare{color:var(--orange-2)} #log .geo{color:var(--plum-2)} #log .boot{color:var(--faint)}
+#log b{color:var(--ink)}
+
+/* منطقة الرادار */
+#radarWrap{display:flex;flex-direction:column;min-height:0;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.radar-tools{display:flex;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line)}
+.tools-title{margin-inline-end:auto;font-family:var(--mono);font-size:10px;color:var(--faint);letter-spacing:.1em}
+.btn{display:inline-flex;align-items:center;gap:6px;background:transparent;border:1px solid var(--line-2);color:var(--muted);font-family:var(--mono);font-size:10.5px;padding:5px 10px;border-radius:5px;cursor:pointer;transition:border-color .15s,color .15s,background .15s;user-select:none}
+.btn:hover{border-color:var(--orange);color:var(--orange-2)}
+.btn.active{background:rgba(233,84,32,.12);border-color:var(--orange);color:var(--orange-2)}
+.btn.sq{padding:5px 8px}
+.btn svg{width:13px;height:13px;display:block}
+.btn .ic-play{display:none}
+.btn.paused .ic-play{display:block}
+.btn.paused .ic-pause{display:none}
+.btn .ic-on{display:none}
+.btn.muted .ic-on{display:block}
+.btn.muted .ic-off{display:none}
+.spin svg{animation:rot 1s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+.vr{width:1px;height:18px;background:var(--line-2)}
+#radarStage{position:relative;flex:1;min-height:0}
+canvas#radar{position:absolute;inset:0;cursor:crosshair}
+#tip{position:absolute;pointer-events:none;background:rgba(30,14,23,.96);border:1px solid var(--line-2);border-radius:7px;padding:8px 11px;font-size:11px;line-height:1.7;display:none;z-index:20;max-width:230px;box-shadow:0 6px 20px rgba(0,0,0,.5)}
+#tip b{color:var(--orange-2)}
+#tip span{display:block;color:var(--muted);font-family:var(--mono);font-size:10px}
+#tip .dim{color:var(--faint)}
+#bootTag{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;pointer-events:none;transition:opacity .6s}
+#bootTag.gone{opacity:0}
+#bootTag .bt1{font-family:var(--mono);font-size:12px;letter-spacing:.3em;color:var(--orange-2)}
+#bootTag .bt2{font-size:12px;color:var(--muted);animation:blip 1.6s infinite}
+#lock{position:absolute;bottom:12px;inset-inline-start:12px;width:250px;background:rgba(30,14,23,.97);border:1px solid var(--line-2);border-radius:9px;padding:11px 13px;z-index:15}
+.lk-head{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:700;color:var(--orange-2);margin-bottom:8px}
+.lk-head svg{width:13px;height:13px}
+.lk-head .xbtn{margin-inline-start:auto}
+.xbtn{background:none;border:none;color:var(--faint);cursor:pointer;display:flex;padding:2px}
+.xbtn:hover{color:var(--ink)}
+.xbtn svg{width:13px;height:13px}
+.lk-row{display:flex;justify-content:space-between;font-size:10.5px;padding:2.5px 0;color:var(--muted)}
+.lk-row .v{font-family:var(--mono);color:var(--ink)}
+.lk-azbar{position:relative;height:5px;background:var(--panel-3);border-radius:3px;margin-top:9px;direction:ltr}
+.lk-azbar .tick{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--line-2)}
+#lkMark{position:absolute;top:-3.5px;width:12px;height:12px;margin-left:-6px;border-radius:50%;border:2px solid var(--orange);background:var(--bg);transition:left 1s linear}
+.radar-legend{display:flex;align-items:center;flex-wrap:wrap;gap:14px;padding:8px 14px;border-top:1px solid var(--line);font-size:10px;color:var(--muted)}
+.lg{display:flex;align-items:center;gap:6px}
+.lg.dim{color:var(--faint);font-family:var(--mono);font-size:9px}
+.sw{width:9px;height:9px;border-radius:50%;display:inline-block}
+.sw.dia{border-radius:2px;transform:rotate(45deg);width:8px;height:8px}
+.sw.nz{background:transparent;border:1px solid var(--faint);width:6px;height:6px}
+.sep{flex:1}
+#hint{position:absolute;bottom:52px;left:50%;transform:translateX(-50%);background:rgba(30,14,23,.95);border:1px solid var(--line-2);border-radius:6px;padding:5px 12px;font-family:var(--mono);font-size:10.5px;color:var(--orange-2);opacity:0;transition:opacity .3s;pointer-events:none;z-index:25}
+#hint.show{opacity:1}
+
+/* الطيف الزمني */
+#spec{margin:0 14px 12px;height:200px;background:var(--panel);border:1px solid var(--line);border-radius:12px;display:flex;flex-direction:column;overflow:hidden}
+.spec-head{display:flex;align-items:center;gap:12px;padding:8px 14px;border-bottom:1px solid var(--line)}
+.spec-title{font-size:11.5px;font-weight:600;color:var(--muted)}
+.spec-ch{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:9px;color:var(--faint)}
+.spec-ch i{width:14px;height:2.5px;border-radius:2px;display:inline-block}
+.spec-head .sep{flex:1}
+.spec-src{font-family:var(--mono);font-size:9px;color:var(--faint)}
+.spec-body{flex:1;position:relative;min-height:0}
+canvas#wave{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair}
+
+/* التذييل */
+footer{display:flex;align-items:center;gap:16px;padding:0 16px;background:var(--bg-deep);border-top:1px solid var(--line);font-size:10.5px;color:var(--muted);position:relative}
+footer .foot-m{flex:1;text-align:center;color:var(--faint);font-family:var(--mono);font-size:9px}
+footer b{color:var(--ink)}
+
+/* حزمة النشر */
+#pkg{position:absolute;bottom:44px;inset-inline-end:14px;width:360px;background:var(--panel-2);border:1px solid var(--line-2);border-radius:10px;padding:14px;z-index:40;box-shadow:0 14px 44px rgba(0,0,0,.6)}
+.pkg-head{display:flex;align-items:center;font-weight:700;font-size:13px;margin-bottom:6px}
+.pkg-head .xbtn{margin-inline-start:auto}
+#pkg p{font-size:11px;color:var(--muted);line-height:1.7;margin-bottom:10px}
+.pkg-btns{display:flex;gap:8px;margin-bottom:10px}
+.pkg-btns .btn{flex:1;justify-content:center}
+#pkg ol{margin-inline-start:18px;font-size:10.5px;color:var(--faint);line-height:1.9}
+#pkg code{font-family:var(--mono);color:var(--orange-2);font-size:10px}
+
+@media(max-width:1060px){
+  body{overflow:auto;height:auto;grid-template-rows:52px auto auto 36px}
+  main{grid-template-columns:1fr}
+  aside{order:2}
+  #radarWrap{order:1;min-height:520px}
+  .top-mid{display:none}
+}
+@media(max-height:800px){ #spec{height:160px} }
+</style>
+</head>
+<body>
+
+<header id="topbar">
+  <div class="brand">
+    <svg viewBox="0 0 48 48" aria-hidden="true">
+      <circle cx="24" cy="24" r="20" fill="none" stroke="#4a2135" stroke-width="1.6"/>
+      <circle cx="24" cy="24" r="13" fill="none" stroke="#381a29"/>
+      <circle cx="24" cy="24" r="6"  fill="none" stroke="#381a29"/>
+      <path d="M24 24 L24 4 A20 20 0 0 1 41.32 14 Z" fill="rgba(233,84,32,.30)"/>
+      <line x1="24" y1="24" x2="41.32" y2="14" stroke="#e95420" stroke-width="1.7"/>
+      <circle class="lp" cx="30.8" cy="15.3" r="1.9" fill="#ff8a54"/>
+      <circle cx="24" cy="24" r="1.7" fill="#f2e7ed"/>
+    </svg>
+    <div>
+      <span class="brand-name">FATYAK</span>
+      <span class="brand-sub">ELECTROMAGNETIC RADAR · FTR-01</span>
+    </div>
+  </div>
+  <div class="top-mid"><span class="sys">FTR-01</span>منظومة الرصد الشمسي–الأرضي للأمواج الكهرومغناطيسية</div>
+  <div class="top-end">
+    <span id="lastSync" class="num">Δ —</span>
+    <div class="badge" id="modeBadge" data-m="boot"><span class="dot"></span><span id="modeTxt">إقلاع</span></div>
+    <div class="clockbox"><span id="clock" class="num">--:--:-- UTC</span><span id="clockLocal" class="num">--:-- محلي</span></div>
+  </div>
+</header>
+
+<main>
+  <aside>
+    <section class="meter">
+      <div class="m-top"><span class="m-name">التدفق السيني الناعم</span><span class="m-code">GOES-XRS · 1–8 Å</span></div>
+      <div class="m-val"><span class="pill" id="fluxClass">—</span><span class="big num" id="fluxVal">—</span></div>
+      <div class="m-unit">وات/م² · W/m² — المقياس لوغاريتمي</div>
+      <div class="scale" dir="ltr">
+        <div class="scale-track">
+          <i style="background:rgba(143,154,163,.25)"></i><i style="background:rgba(42,161,95,.28)"></i><i style="background:rgba(217,161,43,.28)"></i><i style="background:rgba(233,84,32,.30)"></i><i style="background:rgba(207,74,88,.32)"></i>
+          <div class="scale-mark" id="fluxMark"></div>
+        </div>
+        <div class="scale-lbls"><span>A</span><span>B</span><span>C</span><span>M</span><span>X</span></div>
+      </div>
+    </section>
+
+    <section class="meter">
+      <div class="m-top"><span class="m-name">النشاط الجيومغناطيسي</span><span class="m-code">PLANETARY Kp</span></div>
+      <div class="kp-row">
+        <span class="big num" id="kpVal">—</span>
+        <canvas id="kpCv"></canvas>
+      </div>
+    </section>
+
+    <section class="meter">
+      <div class="m-top"><span class="m-name">الحقل المغناطيسي المداري</span><span class="m-code">GOES-MAG · Hp</span></div>
+      <div class="mag-row">
+        <div><span class="big num" style="font-size:22px" id="magVal">—</span> <span style="font-family:var(--mono);font-size:10px;color:var(--faint)">nT</span></div>
+        <span id="magDelta" class="num">Δ —</span>
+      </div>
+      <canvas id="magSpark"></canvas>
+    </section>
+
+    <section class="log-block">
+      <div class="log-head"><i data-lucide="terminal" style="width:12px;height:12px;color:var(--faint)"></i> سجل الرصد الحي
+        <span class="cnt">أهداف نشطة <b id="tCount" class="num">0</b></span>
+      </div>
+      <div id="log"></div>
+    </section>
+  </aside>
+
+  <section id="radarWrap">
+    <div class="radar-tools">
+      <span class="tools-title">PPI · السمت / شدة الإشارة</span>
+      <button class="btn active" id="btnSweep"><i data-lucide="pause" class="ic-pause"></i><i data-lucide="play" class="ic-play"></i><span id="sweepLbl">إيقاف المسح</span></button>
+      <button class="btn" id="btnSpeed"><i data-lucide="gauge"></i><span id="speedLbl">دورة 9ث</span></button>
+      <div class="vr"></div>
+      <button class="btn sq" id="gMinus">−</button>
+      <button class="btn" id="gReset" title="نقر يعيد الضبط"><span id="gainLbl">×1.0</span></button>
+      <button class="btn sq" id="gPlus">+</button>
+      <div class="vr"></div>
+      <button class="btn sq muted" id="btnSound" title="تنبيه صوتي عند الالتقاط"><i data-lucide="volume-2" class="ic-off"></i><i data-lucide="volume-x" class="ic-on"></i></button>
+      <button class="btn" id="btnSync"><i data-lucide="refresh-cw"></i><span>تزامن</span></button>
+    </div>
+    <div id="radarStage">
+      <canvas id="radar"></canvas>
+      <div id="bootTag"><span class="bt1">FATYAK RADAR</span><span class="bt2">جارٍ الالتحاق بقناة GOES-Primary …</span></div>
+      <div id="tip"></div>
+      <div id="lock" hidden>
+        <div class="lk-head"><i data-lucide="crosshair"></i> تتبع هدف — LOCK
+          <button class="xbtn" id="lkClose"><i data-lucide="x"></i></button>
+        </div>
+        <div class="lk-row"><span>الهدف</span><span class="v" id="lkName">—</span></div>
+        <div class="lk-row"><span>التصنيف</span><span class="v" id="lkCls">—</span></div>
+        <div class="lk-row"><span>السمت الفعلي</span><span class="v num" id="lkAz">—</span></div>
+        <div class="lk-row"><span>الشدة</span><span class="v num" id="lkPow">—</span></div>
+        <div class="lk-row"><span>عمر الرصد</span><span class="v num" id="lkAge">—</span></div>
+        <div class="lk-azbar">
+          <span class="tick" style="left:25%"></span><span class="tick" style="left:50%"></span><span class="tick" style="left:75%"></span>
+          <div id="lkMark"></div>
+        </div>
+      </div>
+      <div id="hint"></div>
+    </div>
+    <div class="radar-legend">
+      <span class="lg"><i class="sw" style="background:var(--warn)"></i>الشمس (هدف فلكي)</span>
+      <span class="lg"><i class="sw" style="background:var(--orange)"></i>توهج شمسي مُرصد</span>
+      <span class="lg"><i class="sw dia" style="background:var(--plum-2)"></i>اضطراب جيومغناطيسي</span>
+      <span class="lg"><i class="sw nz"></i>ضجيج خلفية</span>
+      <span class="sep"></span>
+      <span class="lg dim" id="srcTag">SRC · CONNECTING</span>
+      <span class="lg dim">النصف القطر: شدة لوغاريتمية · الزاوية: السمت الفعلي</span>
+    </div>
+  </section>
+</main>
+
+<section id="spec">
+  <div class="spec-head">
+    <span class="spec-title">الطيف الزمني — نافذة الرصد</span>
+    <span class="spec-ch"><i style="background:var(--orange)"></i>1–8 Å (القناة المعيارية)</span>
+    <span class="spec-ch"><i style="background:var(--plum-2)"></i>0.5–4 Å</span>
+    <span class="sep"></span>
+    <span class="spec-src">XRS · GOES PRIMARY</span>
+  </div>
+  <div class="spec-body"><canvas id="wave"></canvas></div>
+</section>
+
+<footer>
+  <span>© <span id="yr" class="num"></span> <b>FATYAK</b> · FATYAK RADAR v1.0.0</span>
+  <span class="foot-m">القياسات: بث حي من مرصد الفضاء NOAA / NWS — SWPC · تحديث تلقائي كل 60ث · عرض رصدٍ هواة وليس بديلاً عن الإنذار الرسمي</span>
+  <button class="btn" id="pkgBtn"><i data-lucide="github"></i><span>حزمة النشر على GitHub</span></button>
+</footer>
+
+<div id="pkg" hidden>
+  <div class="pkg-head">حزمة النشر — 3 ملفات جاهزة<button class="xbtn" id="pkgClose"><i data-lucide="x"></i></button></div>
+  <p>حمّل الملفات الثلاثة في مجلد واحد باسم <code>fatyak-radar</code>، فهي مستودعك كاملاً.</p>
+  <div class="pkg-btns">
+    <button class="btn" data-f="index"><i data-lucide="download"></i>index.html</button>
+    <button class="btn" data-f="readme"><i data-lucide="download"></i>README.md</button>
+    <button class="btn" data-f="license"><i data-lucide="download"></i>LICENSE</button>
+  </div>
+  <ol>
+    <li>أنشئ مستودعاً جديداً باسم <code>fatyak-radar</code> على حسابك.</li>
+    <li>ارفع الملفات الثلاثة (Add file → Upload files) ثم Commit.</li>
+    <li>فعّل النشر: Settings → Pages ← Branch: <code>main</code> / <code>root</code>.</li>
+    <li>بعد دقيقة يعمل رادارك على <code>https://اسمك.github.io/fatyak-radar</code></li>
+  </ol>
+</div>
+
 <script>
-const o=document.getElementById('o'),i=document.getElementById('i'),t=document.getElementById('t');
-const LOGO=` ███████╗ █████╗ ████████╗██╗   ██╗ █████╗ ██╗  ██╗
- ██╔════╝██╔══██╗╚══██╔══╝╚██╗ ██╔╝██╔══██╗██║ ██╔╝
- █████╗  ███████║   ██║    ╚████╔╝ ███████║█████╔╝
- ██╔══╝  ██╔══██║   ██║     ╚██╔╝  ██╔══██║██╔═██╗
- ██║     ██║  ██║   ██║      ██║   ██║  ██║██║  ██╗
- ╚═╝     ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝  ╚═╝`;
-const GH='https://github.com/FATYAK/FATYAK-Shell';
-const LANGS=[['python','Python 3.12','10 MB'],['node','JavaScript (Node.js 22)','30 MB'],['deno','TypeScript (Deno)','40 MB'],['java','Java 21','190 MB'],['go','Go 1.23','75 MB'],['php','PHP 8.3','30 MB'],['c','C (Zig)','80 MB'],['cpp','C++ (Zig)','shared']];
-const C={
- help:()=>`<span class="o">Commands</span>
-  about      what FATYAK Shell is
-  langs      supported languages
-  install    how to run it on Windows
-  demo       sample session
-  github     open the repository
-  banner     show the logo
-  clear      clear the screen`,
- about:()=>`FATYAK Shell runs Python, JavaScript, TypeScript, Java, Go, PHP, C and C++
-from one PowerShell window. Free, local, no API, nothing to install:
-each runtime is a portable ZIP downloaded once. Developer: <span class="o">FATYAK</span>`,
- langs:()=>LANGS.map(l=>`  <span class="p">${l[0].padEnd(8)}</span>${l[1].padEnd(26)}<span class="d">${l[2]}</span>`).join('\n'),
- install:()=>`<span class="d"># in PowerShell</span>
-git clone ${GH}.git
-cd FATYAK-Shell
-powershell -ExecutionPolicy Bypass -File .\\FATYAK-Shell.ps1`,
- demo:()=>`<span class="p">fatyak</span> &gt; Run code &gt; [1] Python 3.12
-print("Hello from FATYAK")
-:run
-Hello from FATYAK
-<span class="d">exit code: 0</span>`,
- github:()=>{open(GH,'_blank','noopener');return `Opening <a href="${GH}" target="_blank" rel="noopener">${GH}</a>`},
- banner:()=>`<span class="o">${LOGO}</span>\n<span class="d">  S H E L L  ·  local, free, no API  ·  by FATYAK</span>`,
- clear:()=>{o.innerHTML='';return null}
+'use strict';
+/* ================= أدوات عامة ================= */
+const $=id=>document.getElementById(id);
+const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+const DEG=Math.PI/180;
+const pad2=n=>String(n).padStart(2,'0');
+const utcHMS=(d=new Date())=>pad2(d.getUTCHours())+':'+pad2(d.getUTCMinutes())+':'+pad2(d.getUTCSeconds());
+const MONO='"IBM Plex Mono",monospace', SANS='"IBM Plex Sans Arabic",sans-serif';
+const COL={ink:'#f2e7ed',faint:'#7c5c6d',muted:'#b18ea0',line:'#381a29',line2:'#4a2135',
+  orange:'#e95420',orange2:'#ff8a54',plum2:'#c0619b',ok:'#2aa15f',warn:'#d9a12b',crit:'#cf4a58',gray:'#8f9aa3'};
+function fmtExp(v){ if(!isFinite(v)||v<=0)return '—'; return v.toExponential(2); }
+
+/* ================= الحالة ================= */
+const S={
+  mode:'boot', sweepOn:true, sweepDeg:0, dps:360/9, speedIdx:1,
+  speeds:[{d:18,l:'دورة 18ث'},{d:9,l:'دورة 9ث'},{d:4,l:'دورة 4ث'}],
+  gain:1, sound:false,
+  fluxLong:null, fluxShort:null, classInfo:null,
+  kp:null, hp:null, hpHist:[],
+  longSeries:[], shortSeries:[],
+  targets:[], shocks:[], noises:[], detected:[],
+  lastSync:null, syncing:false, lock:null, prevKp4:false,
 };
-C.ls=C.langs;C['?']=C.help;
-const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
-const out=h=>{o.insertAdjacentHTML('beforeend',h+'\n');t.scrollTop=t.scrollHeight};
-const hist=[];let hi=0;
-function run(v){out(`<span class="p">fatyak@shell</span>:<span class="pb">~</span>$ ${esc(v)}`);const c=v.trim().toLowerCase();if(!c)return;
- hist.push(v);hi=hist.length;const f=C[c];const r=f?f():`${esc(c)}: command not found. Type <span class="o">help</span>.`;if(r!==null)out(r+'\n')}
-i.addEventListener('keydown',e=>{
- if(e.key==='Enter'){run(i.value);i.value=''}
- else if(e.key==='ArrowUp'&&hi>0){i.value=hist[--hi];e.preventDefault()}
- else if(e.key==='ArrowDown'){i.value=hist[++hi]||'';if(hi>hist.length)hi=hist.length}
- else if(e.key==='Tab'){e.preventDefault();const m=Object.keys(C).filter(k=>k.startsWith(i.value)&&i.value);if(m.length===1)i.value=m[0]}
- else if(e.key==='l'&&e.ctrlKey){e.preventDefault();C.clear()}});
-t.addEventListener('click',()=>{if(!getSelection().toString())i.focus()});
-out(C.banner()+'\n');out('Welcome to FATYAK Shell. Type <span class="o">help</span> to begin.\n');
-</script></body></html>
+const URLS={
+  x:'https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json',
+  k:'https://services.swpc.noaa.gov/json/planetary_k_index_1m.json',
+  m:'https://services.swpc.noaa.gov/json/goes/primary/magnetometers-1-day.json'
+};
+let tid=1, lastFlareAt=0;
+
+/* ================= سجل الرصد ================= */
+function log(msg,cls='net'){
+  const el=document.createElement('div'); el.className='ln '+cls;
+  el.innerHTML='<span class="lt num">['+utcHMS()+']</span> '+msg;
+  const box=$('log'); box.appendChild(el);
+  while(box.children.length>140) box.removeChild(box.firstChild);
+  box.scrollTop=box.scrollHeight;
+}
+let hintT=null;
+function hint(t){ const h=$('hint'); h.textContent=t; h.classList.add('show');
+  clearTimeout(hintT); hintT=setTimeout(()=>h.classList.remove('show'),1400); }
+
+/* ================= الصوت ================= */
+let AC=null;
+function ensureAC(){ try{ if(!AC)AC=new (window.AudioContext||window.webkitAudioContext)();
+  if(AC.state==='suspended')AC.resume(); }catch(e){} }
+function beep(f0,f1,dur,vol,type){
+  if(!S.sound||!AC)return;
+  try{ const t=AC.currentTime,o=AC.createOscillator(),g=AC.createGain();
+    o.type=type||'sine'; o.frequency.setValueAtTime(f0,t);
+    o.frequency.exponentialRampToValueAtTime(Math.max(f1,1),t+dur);
+    g.gain.setValueAtTime(vol||.12,t); g.gain.exponentialRampToValueAtTime(.0001,t+dur);
+    o.connect(g).connect(AC.destination); o.start(t); o.stop(t+dur+.02);
+  }catch(e){}
+}
+
+/* ================= الحالة والشارات ================= */
+function setBadge(){
+  const b=$('modeBadge');
+  b.setAttribute('data-m',S.mode);
+  $('modeTxt').textContent = S.mode==='live'?'مباشر':(S.mode==='sim'?'محاكاة':'إقلاع');
+  const st=$('srcTag');
+  st.textContent = S.mode==='live'?'SRC · NOAA/SWPC — GOES PRIMARY':(S.mode==='sim'?'SRC · LOCAL SIMULATION':'SRC · CONNECTING');
+}
+function updateSyncAge(){
+  const el=$('lastSync');
+  if(!S.lastSync){ el.textContent='Δ —'; el.classList.remove('stale'); return; }
+  const s=Math.floor((Date.now()-S.lastSync)/1000);
+  el.textContent='Δ '+s+'s';
+  el.classList.toggle('stale', s>150);
+}
+function hideBoot(){ $('bootTag').classList.add('gone'); setTimeout(()=>$('bootTag').remove(),700); }
+
+/* ================= التصنيف الشمسي ================= */
+function classify(f){
+  const T=[[1e-4,'X',COL.crit,5],[1e-5,'M',COL.orange,4],[1e-6,'C',COL.warn,3],[1e-7,'B',COL.ok,2]];
+  for(const [th,L,c,o] of T) if(f>=th) return {L,c,o,n:f/th};
+  return {L:'A',c:COL.gray,o:1,n:f/1e-8};
+}
+const clsLabel=c=>c.L+c.n.toFixed(1);
+
+/* ================= الأهداف ================= */
+/* سمت الشمس الحقيقي (تقريب خط الزوال المحلي 12:00، خطأ ≤ 4°) */
+function sunAz(){ const d=new Date(); const h=d.getHours()+d.getMinutes()/60+d.getSeconds()/3600;
+  let az=(h-12)*15; return ((az%360)+360)%360; }
+function addTarget(t){ t.id=tid++; t.born=performance.now(); S.targets.push(t); return t; }
+function ensureSun(){
+  let s=S.targets.find(t=>t.kind==='sun');
+  const f=S.fluxLong||3e-6;
+  if(!s){ s=addTarget({kind:'sun',label:'الشمس — SOL',color:COL.warn,az:sunAz(),exp:Math.log10(f),life:0});
+    log('تثبيت الهدف الفلكي: <b>الشمس</b> — تتبع السمت الفعلي المشتق من التوقيت','ok'); }
+  s.az=sunAz(); s.exp=Math.log10(f);
+  return s;
+}
+function flareEvent(f){
+  const now=performance.now();
+  if(now-lastFlareAt<4*60*1000) return;
+  lastFlareAt=now;
+  const c=classify(f), sun=ensureSun();
+  const t=addTarget({kind:'flare',az:(sun.az+(Math.random()*16-8)+360)%360,
+    exp:Math.log10(f),color:COL.orange,life:25*60*1000,
+    label:'توهج شمسي '+clsLabel(c),
+    meta:{cls:clsLabel(c),flux:f}});
+  S.shocks.push({az:t.az,exp:t.exp,t0:now});
+  S.detected.push({t:Date.now(),exp:t.exp});
+  log('رصد توهج جديد <b>'+clsLabel(c)+'</b> — التدفق '+fmtExp(f)+' W/m²','flare');
+  beep(520,980,.22,.14);
+}
+function geoEvent(kp){
+  const t=addTarget({kind:'geo',az:0,exp:-(4+(9-kp)*0.3),color:COL.plum2,
+    life:45*60*1000,label:'عاصفة جيومغناطيسية Kp'+kp,meta:{kp}});
+  S.shocks.push({az:0,exp:t.exp,t0:now()});
+  S.detected.push({t:Date.now(),exp:t.exp});
+  log('تجاوز مؤشر Kp الحد — <b>Kp'+kp+'</b>: نشاط جيومغناطيسي مضطرب','geo');
+  beep(300,170,.3,.12,'triangle');
+  function now(){return performance.now();}
+}
+function refreshCounts(){
+  const n=S.targets.filter(t=>t.kind!=='noise'&&(!t.life||performance.now()-t.born<t.life)).length;
+  $('tCount').textContent=n;
+}
+
+/* ================= خط أنابيب البيانات ================= */
+function apply(d){
+  if(d.long&&d.long>0){
+    const prev=S.fluxLong; S.fluxLong=d.long;
+    if(d.short>0)S.fluxShort=d.short;
+    const c=classify(d.long); S.classInfo=c; updateFluxUI(c,d.long);
+    if(d.real&&prev){
+      if(d.long>prev*2.5&&d.long>=1e-6) flareEvent(d.long);
+    }
+  }
+  if(d.kp!=null){
+    const prev=S.kp; S.kp=d.kp; updateKpUI(d.kp);
+    if(d.real&&prev!=null&&prev<4&&d.kp>=4) geoEvent(d.kp);
+    S.prevKp4 = d.kp>=4;
+  }
+  if(d.hp!=null){
+    const df=S.hp!=null?d.hp-S.hp:null;
+    if(d.real&&df!=null&&Math.abs(df)>=20)
+      log('قفزة مغناطيسية مفاجئة Δ'+df.toFixed(1)+' nT','warn');
+    S.hp=d.hp; S.hpHist.push(d.hp); if(S.hpHist.length>60)S.hpHist.shift();
+    updateMagUI(d.hp,df);
+  }
+  if(d.seriesLong)S.longSeries=d.seriesLong;
+  if(d.seriesShort)S.shortSeries=d.seriesShort;
+}
+
+/* ================= المزامنة مع NOAA ================= */
+async function getJ(u){
+  const c=new AbortController(); const to=setTimeout(()=>c.abort(),12000);
+  try{ const r=await fetch(u,{signal:c.signal,cache:'no-store'});
+    if(!r.ok)throw new Error('HTTP '+r.status); return await r.json();
+  } finally{ clearTimeout(to); }
+}
+function parseX(arr){
+  const L=[],Sh=[]; let lastL=null,lastS=null;
+  for(const it of arr){
+    const e=it.energy||''; const v=(it.flux!=null)?it.flux:it.obs_flux;
+    if(!(v>0))continue; const t=Date.parse(it.time_tag); if(isNaN(t))continue;
+    if(e.indexOf('1-8')>=0){L.push({t,v}); lastL={t,v};}
+    else if(e.indexOf('0.5')>=0){Sh.push({t,v}); lastS={t,v};}
+  }
+  return {L,Sh,lastL,lastS};
+}
+function parseK(arr){
+  for(let i=arr.length-1;i>=0;i--){ const it=arr[i];
+    const v=(it.kp_index!=null)?it.kp_index:(it.Kp!=null?it.Kp:(it.kp!=null?it.kp:it.estimated_kp));
+    if(v!=null)return +v; }
+  return null;
+}
+function parseHp(arr){
+  const it=arr[arr.length-1]; if(!it)return null;
+  const v=(it.Hp_Eu!=null)?it.Hp_Eu:it.hp_eu;
+  return (typeof v==='number')?v:null;
+}
+async function sync(manual){
+  if(S.syncing)return; S.syncing=true;
+  $('btnSync').classList.add('spin');
+  let ok=false;
+  try{
+    const [rx,rk,rm]=await Promise.allSettled([getJ(URLS.x),getJ(URLS.k),getJ(URLS.m)]);
+    if(rx.status==='fulfilled'){
+      const p=parseX(rx.value);
+      if(p.L.length){
+        S.mode='live'; ok=true;
+        apply({long:p.lastL?p.lastL.v:null, short:p.lastS?p.lastS.v:(p.lastL?p.lastL.v:null),
+               seriesLong:p.L, seriesShort:p.Sh, real:true});
+        log('مزامنة GOES-XRS — 1–8 Å: <b>'+fmtExp(p.lastL.v)+'</b> W/m² ('+clsLabel(S.classInfo)+')','ok');
+      }
+    }
+    if(rk.status==='fulfilled'){ const kp=parseK(rk.value); if(kp!=null)apply({kp,real:true}); }
+    if(rm.status==='fulfilled'){ const hp=parseHp(rm.value); if(hp!=null)apply({hp,real:true}); }
+  }catch(e){}
+  S.syncing=false; $('btnSync').classList.remove('spin');
+  if(ok){
+    const back=(document.body.dataset.wasSim==='1');
+    if(back){ log('استُعيد الاتصال — العودة إلى البث المباشر','ok'); document.body.dataset.wasSim='0'; }
+    S.lastSync=Date.now(); ensureSun(); hideBoot(); drawWave(); refreshCounts(); setBadge();
+  }else{
+    if(manual)log('فشلت المزامنة اليدوية','crit');
+    enterSim();
+  }
+}
+
+/* ================= وضع المحاكاة (موسوم بوضوح) ================= */
+let simTimer=null, simF=-5.7, simBoost=0, simKp=2, simHp=52;
+function enterSim(){
+  const first=(S.mode!=='sim');
+  S.mode='sim'; setBadge(); document.body.dataset.wasSim='1';
+  if(first){
+    log(S.lastSync?'انقطع الاتصال بمصدر NOAA — التبديل إلى <b>وضع المحاكاة</b>'
+                  :'تعذر الوصول إلى NOAA SWPC — التشغيل في <b>وضع المحاكاة</b> (قيم اصطناعية)','warn');
+    beep(400,160,.35,.1,'triangle');
+    hideBoot(); ensureSun();
+  }
+  if(!simTimer){ simTimer=setInterval(simStep,2000); simStep(); }
+}
+function simStep(){
+  if(S.mode!=='sim')return;
+  simF+=(Math.random()-.5)*.06; simF+=(-5.7-simF)*.02;
+  simBoost*=.55;
+  const erupted=Math.random()<.035;
+  if(erupted)simBoost=.9+Math.random()*1.4;
+  const f=Math.pow(10,Math.min(simF+simBoost,-3.05));
+  simKp=clamp(simKp+(Math.random()<.2?(Math.random()<.5?-1:1):0),0,8);
+  simHp=52+Math.sin(Date.now()/60000)*6+(Math.random()-.5)*2;
+  const now=Date.now();
+  S.longSeries.push({t:now,v:f});
+  S.shortSeries.push({t:now,v:f*(.35+Math.random()*.2)});
+  while(S.longSeries.length&&S.longSeries[0].t<now-8*60e3)S.longSeries.shift();
+  while(S.shortSeries.length&&S.shortSeries[0].t<now-8*60e3)S.shortSeries.shift();
+  apply({long:f,short:f*.5,kp:simKp,hp:simHp,real:false});
+  if(erupted&&f>=1e-6)flareEvent(f);
+  if(!S.prevKp4&&simKp>=4)geoEvent(simKp);
+  S.prevKp4=simKp>=4;
+  drawWave(); refreshCounts();
+}
+
+/* ================= مؤشرات الواجهة ================= */
+function updateFluxUI(c,f){
+  const p=$('fluxClass');
+  p.textContent=clsLabel(c);
+  p.style.color=c.c; p.style.borderColor=c.c+'66'; p.style.background=c.c+'1d';
+  $('fluxVal').textContent=fmtExp(f);
+  const pos=clamp((Math.log10(f)+9)/6*100,0,100);
+  $('fluxMark').style.left=pos+'%'; $('fluxMark').style.background=c.c;
+}
+function updateKpUI(kp){
+  const el=$('kpVal'); el.textContent=kp.toFixed(1);
+  el.style.color = kp>=5?COL.crit:(kp>=4?COL.warn:COL.ok);
+  drawKp(kp);
+}
+function updateMagUI(hp,d){
+  $('magVal').textContent=hp.toFixed(1);
+  const el=$('magDelta');
+  if(d!=null){ el.textContent='Δ '+(d>=0?'+':'')+d.toFixed(1)+' nT';
+    el.style.color=Math.abs(d)>=20?COL.warn:COL.faint; }
+  drawSpark();
+}
+
+/* لوحة Kp القوسية */
+const kpCv=$('kpCv');
+function sizeKp(){ const w=150,h=64,d=Math.min(devicePixelRatio||1,2);
+  kpCv.width=w*d;kpCv.height=h*d;kpCv.style.width=w+'px';kpCv.style.height=h+'px';
+  kpCv.getContext('2d').setTransform(d,0,0,d,0,0); }
+function drawKp(kp){
+  const g=kpCv.getContext('2d'),w=150,h=64,cx=w/2,cy=h-8,r=46;
+  g.clearRect(0,0,w,h);
+  const seg=(a0,a1,c)=>{g.beginPath();g.arc(cx,cy,r,Math.PI+a0*Math.PI/9,Math.PI+a1*Math.PI/9);
+    g.strokeStyle=c;g.lineWidth=8;g.lineCap='butt';g.stroke();};
+  seg(0,4,'rgba(42,161,95,.35)'); seg(4,5,'rgba(217,161,43,.45)'); seg(5,9,'rgba(207,74,88,.45)');
+  if(kp==null)return;
+  const a=Math.PI+clamp(kp,0,9)/9*Math.PI;
+  g.beginPath();g.moveTo(cx,cy);g.lineTo(cx+Math.cos(a)*(r-7),cy+Math.sin(a)*(r-7));
+  g.strokeStyle=kp>=5?COL.crit:(kp>=4?COL.warn:COL.ok);g.lineWidth=2;g.stroke();
+  g.beginPath();g.arc(cx+Math.cos(a)*(r-7),cy+Math.sin(a)*(r-7),3,0,7);g.fill();
+  g.fillStyle=g.strokeStyle;g.font='600 15px '+MONO;g.textAlign='center';
+  g.fillText(kp.toFixed(1),cx,cy-10);
+}
+/* منحنى Hp المصغر */
+const spCv=$('magSpark');
+function sizeSpark(){ const w=spCv.parentElement.clientWidth-2,d=Math.min(devicePixelRatio||1,2);
+  spCv.width=w*d;spCv.height=26*d;spCv.style.width=w+'px';spCv.style.height='26px';
+  spCv.getContext('2d').setTransform(d,0,0,d,0,0); }
+function drawSpark(){
+  const g=spCv.getContext('2d'),w=spCv.width/(Math.min(devicePixelRatio||1,2)),h=26;
+  g.clearRect(0,0,w,h);
+  const a=S.hpHist; if(a.length<2)return;
+  const mn=Math.min(...a),mx=Math.max(...a),sp=(mx-mn)||1;
+  g.beginPath();
+  a.forEach((v,i)=>{const x=i/(a.length-1)*w,y=h-3-((v-mn)/sp)*(h-6);
+    i?g.lineTo(x,y):g.moveTo(x,y);});
+  g.strokeStyle='rgba(192,97,155,.85)';g.lineWidth=1.4;g.stroke();
+}
+
+/* ================= الرادار PPI ================= */
+const RC=$('radar'),RX=RC.getContext('2d');
+let RW=0,RH=0,CX=0,CY=0,RR=0,DPR=1,bgC=null;
+function expToR(e){ const edge=-9-(S.gain-1)*1.6;
+  return clamp((e-(-3))/(edge-(-3)),0,1)*RR; }
+function sizeRadar(){
+  const box=$('radarStage'),w=box.clientWidth,h=box.clientHeight;
+  DPR=Math.min(devicePixelRatio||1,2);
+  RW=w;RH=h; RC.width=w*DPR;RC.height=h*DPR;
+  CX=w/2;CY=h/2;RR=Math.max(40,Math.min(w,h)/2-42);
+  buildBG();
+}
+function buildBG(){
+  bgC=document.createElement('canvas');bgC.width=RW*DPR;bgC.height=RH*DPR;
+  const g=bgC.getContext('2d'); g.scale(DPR,DPR);
+  g.beginPath();g.arc(CX,CY,RR,0,7);g.fillStyle='#1a0b14';g.fill();
+  g.lineWidth=1.3;g.strokeStyle=COL.line2;g.stroke();
+  g.font='9px '+MONO;g.textAlign='center';g.fillStyle='rgba(124,92,109,.8)';
+  for(let e=-4;e>=-8;e--){
+    const r=expToR(e);
+    g.beginPath();g.arc(CX,CY,r,0,7);g.strokeStyle='rgba(242,231,237,.055)';g.lineWidth=1;g.stroke();
+    g.fillText('1e'+e,CX,CY+r-4);
+  }
+  for(let a=0;a<360;a+=30){
+    const rd=a*DEG,major=a%90===0;
+    g.beginPath();g.moveTo(CX+Math.sin(rd)*RR*.045,CY-Math.cos(rd)*RR*.045);
+    g.lineTo(CX+Math.sin(rd)*RR,CY-Math.cos(rd)*RR);
+    g.strokeStyle=major?'rgba(242,231,237,.09)':'rgba(242,231,237,.045)';
+    g.lineWidth=1;g.stroke();
+  }
+  for(let a=0;a<360;a+=5){
+    const rd=a*DEG,l=a%30===0?7:3;
+    g.beginPath();g.moveTo(CX+Math.sin(rd)*(RR-l),CY-Math.cos(rd)*(RR-l));
+    g.lineTo(CX+Math.sin(rd)*RR,CY-Math.cos(rd)*RR);
+    g.strokeStyle='rgba(124,92,109,.5)';g.lineWidth=1;g.stroke();
+  }
+  const dirs=[[0,'شمال'],[90,'شرق'],[180,'جنوب'],[270,'غرب']];
+  for(const [a,nm] of dirs){
+    const rd=a*DEG,x=CX+Math.sin(rd)*(RR+19),y=CY-Math.cos(rd)*(RR+19);
+    g.font='10.5px '+SANS;g.fillStyle='rgba(177,142,160,.95)';g.fillText(nm,x,y-4);
+    g.font='8.5px '+MONO;g.fillStyle='rgba(124,92,109,.9)';g.fillText(a+'°',x,y+8);
+  }
+}
+function targetPos(t){ const rd=t.az*DEG,r=expToR(t.exp);
+  return [CX+Math.sin(rd)*r,CY-Math.cos(rd)*r]; }
+function glowOf(az,min){ const d=(S.sweepDeg-az+360)%360;
+  return Math.max(min,1-d/230); }
+function spawnNoise(dt){
+  S.noiseAcc=(S.noiseAcc||0)+dt*(S.sweepOn?S.dps/360:0)*2.2;
+  const now=performance.now();
+  while(S.noiseAcc>=1){
+    S.noiseAcc-=1;
+    if(S.noises.length>70)break;
+    S.noises.push({az:(S.sweepDeg+Math.random()*8-4+360)%360,
+      exp:-(6.2+Math.random()*2.6),born:now,life:4000+Math.random()*5000});
+  }
+}
+function drawTarget(t,now){
+  const [x,y]=targetPos(t);
+  if(t.kind==='sun'){
+    const a=glowOf(t.az,.55);
+    RX.globalAlpha=a*.9;
+    RX.strokeStyle=COL.warn;RX.lineWidth=1;
+    for(let i=0;i<8;i++){const rd=i*DEG*45;
+      RX.beginPath();RX.moveTo(x+Math.cos(rd)*6,y+Math.sin(rd)*6);
+      RX.lineTo(x+Math.cos(rd)*9.5,y+Math.sin(rd)*9.5);RX.stroke();}
+    RX.beginPath();RX.arc(x,y,4.5,0,7);RX.fillStyle=COL.warn;RX.fill();
+    RX.beginPath();RX.arc(x,y,9+Math.sin(now/700)*1.5,0,7);
+    RX.strokeStyle='rgba(217,161,43,'+(.5*a)+')';RX.stroke();
+    if(a>.4){ RX.globalAlpha=Math.min(1,(a-.4)*2.2);
+      RX.font='10px '+SANS;RX.textAlign='center';RX.fillStyle=COL.warn;
+      RX.fillText('الشمس',x,y-16);
+      RX.font='8px '+MONO;RX.fillStyle='rgba(124,92,109,.9)';
+      RX.fillText('SOL '+t.az.toFixed(0)+'°',x,y+24); }
+    RX.globalAlpha=1; return;
+  }
+  const age=now-t.born, alive=!t.life||age<t.life;
+  if(!alive)return;
+  let fade=1;
+  if(t.life&&age>t.life-5*60e3)fade=Math.max(0,(t.life-age)/(5*60e3));
+  const a=glowOf(t.az,.12)*fade;
+  if(t.kind==='flare'){
+    RX.globalAlpha=a*.25;RX.beginPath();RX.arc(x,y,9,0,7);RX.fillStyle=COL.orange;RX.fill();
+    RX.globalAlpha=a;RX.beginPath();RX.arc(x,y,3.5,0,7);RX.fillStyle=COL.orange;RX.fill();
+    if(a>.4){ RX.globalAlpha=Math.min(1,(a-.4)*2)*fade;
+      RX.font='9px '+MONO;RX.textAlign='center';RX.fillStyle=COL.orange2;
+      RX.fillText('FLR '+t.meta.cls,x,y-12);
+      RX.fillStyle='rgba(124,92,109,.9)';
+      RX.fillText('T+'+Math.floor(age/60e3)+'m',x,y-2); }
+  }else if(t.kind==='geo'){
+    RX.save();RX.translate(x,y);RX.rotate(Math.PI/4);
+    RX.globalAlpha=a;RX.fillStyle=COL.plum2;RX.fillRect(-3.2,-3.2,6.4,6.4);RX.restore();
+    if(a>.4){ RX.globalAlpha=Math.min(1,(a-.4)*2)*fade;
+      RX.font='9px '+MONO;RX.textAlign='center';RX.fillStyle=COL.plum2;
+      RX.fillText('GST Kp'+t.meta.kp,x,y-12); }
+  }
+  RX.globalAlpha=1;
+}
+function drawSweep(){
+  const a=S.sweepDeg*DEG-DEG/2*180/DEG; /* تحويل: 0° = أعلى */
+  const ca=S.sweepDeg*DEG-Math.PI/2;
+  const dim=S.sweepOn?1:.35;
+  if(S.sweepOn){
+    if(RX.createConicGradient){
+      const gr=RX.createConicGradient(ca-70*DEG,CX,CY);
+      gr.addColorStop(0,'rgba(233,84,32,0)');
+      gr.addColorStop(70/360,'rgba(233,84,32,.26)');
+      gr.addColorStop(70/360+.002,'rgba(233,84,32,0)');
+      gr.addColorStop(1,'rgba(233,84,32,0)');
+      RX.beginPath();RX.moveTo(CX,CY);RX.arc(CX,CY,RR,ca-70*DEG,ca);RX.closePath();
+      RX.fillStyle=gr;RX.fill();
+    }else{
+      for(let i=0;i<14;i++){
+        const a0=ca-(14-i)*5*DEG,a1=a0+5*DEG;
+        RX.beginPath();RX.moveTo(CX,CY);RX.arc(CX,CY,RR,a0,a1);RX.closePath();
+        RX.fillStyle='rgba(233,84,32,'+(.018*i)+')';RX.fill();
+      }
+    }
+  }
+  RX.beginPath();RX.moveTo(CX,CY);
+  RX.lineTo(CX+Math.cos(ca)*RR,CY+Math.sin(ca)*RR);
+  RX.strokeStyle='rgba(255,138,84,'+(.85*dim)+')';RX.lineWidth=1.4;RX.stroke();
+  RX.beginPath();RX.arc(CX+Math.cos(ca)*RR,CY+Math.sin(ca)*RR,2.5,0,7);
+  RX.fillStyle='rgba(255,138,84,'+(.9*dim)+')';RX.fill();
+}
+let lastT=performance.now();
+function frame(now){
+  const dt=Math.min(.05,(now-lastT)/1000); lastT=now;
+  if(S.sweepOn)S.sweepDeg=(S.sweepDeg+S.dps*dt)%360;
+  S.targets=S.targets.filter(t=>!t.life||now-t.born<t.life||(t.kind==='sun'));
+  if(S.lock&&!S.targets.includes(S.lock)&&S.lock.kind!=='sun'){
+    log('انتهاء عمر الهدف — فك التتبع','net'); unlock();
+  }
+  S.noises=S.noises.filter(n=>now-n.born<n.life);
+  RX.setTransform(DPR,0,0,DPR,0,0);
+  RX.clearRect(0,0,RW,RH);
+  if(bgC)RX.drawImage(bgC,0,0,RW,RH);
+  spawnNoise(dt);
+  for(const n of S.noises){
+    const [x,y]=targetPos(n),k=1-(now-n.born)/n.life;
+    RX.globalAlpha=.4*k;RX.fillStyle=COL.ink;
+    RX.beginPath();RX.arc(x,y,1.3,0,7);RX.fill();
+  }
+  RX.globalAlpha=1;
+  for(const t of S.targets)drawTarget(t,now);
+  S.shocks=S.shocks.filter(s=>now-s.t0<1100);
+  for(const s of S.shocks){
+    const k=(now-s.t0)/1100,[x,y]=targetPos(s);
+    RX.beginPath();RX.arc(x,y,6+k*36,0,7);
+    RX.strokeStyle='rgba(255,138,84,'+(.7*(1-k))+')';RX.lineWidth=1.6;RX.stroke();
+  }
+  drawSweep();
+  requestAnimationFrame(frame);
+}
+
+/* تفاعل الرادار: تلميح / قفل / مكسب */
+function pick(mx,my){
+  let best=null,bd=15;
+  for(const t of S.targets){
+    if(t.kind!=='sun'&&t.life&&performance.now()-t.born>t.life)continue;
+    const [x,y]=targetPos(t),d=Math.hypot(mx-x,my-y);
+    if(d<bd){bd=d;best=t;}
+  }
+  return best;
+}
+function showTip(t,mx,my){
+  const tip=$('tip'); let html='';
+  if(t.kind==='sun'){
+    html='<b>الشمس — SOL</b><span class="num">AZ '+t.az.toFixed(1)+'° · FLUX '+fmtExp(10**t.exp)+' W/m²</span>'
+        +(S.classInfo?'<span class="num">CLASS '+clsLabel(S.classInfo)+'</span>':'')
+        +'<span class="dim">انقر لتثبيت التتبع</span>';
+  }else if(t.kind==='flare'){
+    html='<b>توهج شمسي '+t.meta.cls+'</b>'
+        +'<span class="num">AZ '+t.az.toFixed(1)+'° · '+fmtExp(t.meta.flux)+' W/m²</span>'
+        +'<span class="num">T+'+Math.floor((performance.now()-t.born)/60e3)+' min</span>';
+  }else{
+    html='<b>اضطراب جيومغناطيسي</b><span class="num">Kp '+t.meta.kp+' · AZ 0° (قطبي)</span>';
+  }
+  tip.innerHTML=html; tip.style.display='block';
+  const w=$('radarStage');
+  let L=mx+14,T=my+14;
+  if(L>w.clientWidth-230)L=mx-240; if(T>w.clientHeight-90)T=my-84;
+  tip.style.left=L+'px'; tip.style.top=T+'px';
+}
+function hideTip(){ $('tip').style.display='none'; }
+function lockTarget(t){ S.lock=t; $('lock').hidden=false; renderLock();
+  log('تتبع الهدف: <b>'+t.label+'</b>','net'); beep(900,1200,.09,.06); }
+function unlock(){ S.lock=null; $('lock').hidden=true; }
+function renderLock(){
+  const t=S.lock; if(!t)return;
+  $('lkName').textContent=t.label;
+  $('lkAz').textContent=t.az.toFixed(1)+'°';
+  $('lkPow').textContent=fmtExp(10**t.exp)+' W/m²';
+  $('lkCls').textContent = t.kind==='sun'?(S.classInfo?clsLabel(S.classInfo):'—')
+    :(t.kind==='flare'?('FLR '+t.meta.cls):('Kp '+t.meta.kp));
+  $('lkAge').textContent='T+'+Math.floor((performance.now()-t.born)/60e3)+' min';
+  $('lkMark').style.left=(t.az/360*100)+'%';
+}
+function setGain(g){
+  S.gain=clamp(g,.6,2.4);
+  $('gainLbl').textContent='×'+S.gain.toFixed(1);
+  buildBG(); hint('المكسب ×'+S.gain.toFixed(1));
+}
+
+/* ================= الطيف الزمني ================= */
+const WC=$('wave'),WX=WC.getContext('2d');
+let WW=0,WH=0,wHoverT=null;
+function sizeWave(){
+  const b=$('spec').querySelector('.spec-body');
+  WW=b.clientWidth;WH=b.clientHeight;
+  WC.width=WW*DPR;WC.height=WH*DPR;
+}
+function timeWindow(){
+  const now=Date.now();
+  const live=S.mode==='live'&&S.longSeries.length>1;
+  return {t0:now-(live?6*3600e3:8*60e3),t1:now};
+}
+function drawWave(){
+  WX.setTransform(DPR,0,0,DPR,0,0);
+  WX.clearRect(0,0,WW,WH);
+  const padL=48,padR=34,padT=12,padB=20;
+  const iw=WW-padL-padR,ih=WH-padT-padB;
+  if(ih<30||iw<60)return;
+  const L=S.longSeries.filter(p=>p.v>0),Sh=S.shortSeries.filter(p=>p.v>0);
+  const all=L.concat(Sh);
+  if(!all.length){
+    WX.font='11px '+SANS;WX.fillStyle='rgba(124,92,109,.9)';WX.textAlign='center';
+    WX.fillText('بانتظار تدفق البيانات من GOES …',WW/2,WH/2);return;
+  }
+  const {t0,t1}=timeWindow();
+  const xFor=t=>padL+clamp((t-t0)/(t1-t0),0,1)*iw;
+  let mx=-Infinity,mn=Infinity;
+  for(const p of all){const e=Math.log10(p.v);if(e>mx)mx=e;if(e<mn)mn=e;}
+  const eT=clamp(Math.ceil(mx+.2),-4,-2.6), eB=clamp(Math.floor(mn-.2),-9,-6);
+  const yFor=e=>padT+(eT-e)/(eT-eB)*ih;
+  WX.font='8.5px '+MONO;WX.textAlign='right';
+  for(let e=Math.ceil(eB);e<=Math.floor(eT);e++){
+    const y=yFor(e);
+    WX.strokeStyle='rgba(242,231,237,.055)';WX.lineWidth=1;
+    WX.beginPath();WX.moveTo(padL,y);WX.lineTo(WW-padR,y);WX.stroke();
+    WX.fillStyle='rgba(124,92,109,.85)';WX.fillText('1e'+e,padL-6,y+3);
+  }
+  const cats=[[-7,'B',COL.ok],[-6,'C',COL.warn],[-5,'M',COL.orange],[-4,'X',COL.crit]];
+  for(const [e,Lt,c] of cats){
+    if(e>eT||e<eB)continue;
+    const y=yFor(e);
+    WX.strokeStyle='rgba(242,231,237,.13)';
+    WX.beginPath();WX.moveTo(padL,y);WX.lineTo(WW-padR,y);WX.stroke();
+    WX.fillStyle=c;WX.textAlign='left';WX.font='600 9px '+MONO;
+    WX.fillText(Lt,WW-padR+7,yFor(e+.5)+3);
+    WX.font='8.5px '+MONO;WX.textAlign='right';
+  }
+  const line=(ser,color,lw,fill)=>{
+    let started=false;
+    WX.beginPath();
+    for(const p of ser){
+      const x=xFor(p.t),y=yFor(clamp(Math.log10(p.v),eB,eT));
+      started?WX.lineTo(x,y):(WX.moveTo(x,y),started=true);
+    }
+    if(fill&&started){
+      WX.save();WX.lineTo(xFor(ser[ser.length-1].t),yFor(eB));
+      WX.lineTo(xFor(ser[0].t),yFor(eB));WX.closePath();
+      WX.fillStyle='rgba(233,84,32,.09)';WX.fill();WX.restore();
+      WX.beginPath();started=false;
+      for(const p of ser){const x=xFor(p.t),y=yFor(clamp(Math.log10(p.v),eB,eT));
+        started?WX.lineTo(x,y):(WX.moveTo(x,y),started=true);}
+    }
+    WX.strokeStyle=color;WX.lineWidth=lw;WX.stroke();
+  };
+  if(Sh.length)line(Sh,'rgba(192,97,155,.8)',1.1,false);
+  if(L.length)line(L,COL.orange,1.7,true);
+  for(const d of S.detected){
+    if(d.t<t0||d.t>t1)continue;
+    const x=xFor(d.t),y=yFor(clamp(d.exp,eB,eT));
+    WX.save();WX.translate(x,y);WX.rotate(Math.PI/4);
+    WX.fillStyle=COL.orange2;WX.fillRect(-2.6,-2.6,5.2,5.2);WX.restore();
+  }
+  WX.font='8.5px '+MONO;WX.fillStyle='rgba(124,92,109,.85)';WX.textAlign='left';
+  const d0=new Date(t0),d1=new Date(t1);
+  WX.fillText('-'+(S.mode==='live'?'6h':'8m'),padL,WH-6);
+  WX.textAlign='right';
+  WX.fillText('الآن '+pad2(d1.getUTCHours())+':'+pad2(d1.getUTCMinutes())+' UTC',WW-padR,WH-6);
+  if(wHoverT&&wHoverT>=t0&&wHoverT<=t1&&L.length){
+    let best=L[0];
+    for(const p of L)if(Math.abs(p.t-wHoverT)<Math.abs(best.t-wHoverT))best=p;
+    const x=xFor(best.t),y=yFor(clamp(Math.log10(best.v),eB,eT));
+    WX.strokeStyle='rgba(242,231,237,.22)';
+    WX.beginPath();WX.moveTo(x,padT);WX.lineTo(x,WH-padB);WX.stroke();
+    WX.beginPath();WX.arc(x,y,3,0,7);WX.fillStyle=COL.orange2;WX.fill();
+    const dt=new Date(best.t);
+    const txt=pad2(dt.getUTCHours())+':'+pad2(dt.getUTCMinutes())+' UTC · '+fmtExp(best.v);
+    WX.font='9.5px '+MONO;
+    const tw=WX.measureText(txt).width+14;
+    let bx=x+10; if(bx+tw>WW-padR)bx=x-10-tw;
+    WX.fillStyle='rgba(30,14,23,.95)';WX.fillRect(bx,padT+4,tw,17);
+    WX.strokeStyle=COL.line2;WX.strokeRect(bx,padT+4,tw,17);
+    WX.fillStyle=COL.ink;WX.textAlign='left';WX.fillText(txt,bx+7,padT+16);
+  }
+}
+WC.addEventListener('mousemove',e=>{
+  const r=WC.getBoundingClientRect();
+  wHoverT=timeWindow().t0+clamp((e.clientX-r.left-48)/(WW-48-34),0,1)*(timeWindow().t1-timeWindow().t0);
+  drawWave();
+});
+WC.addEventListener('mouseleave',()=>{wHoverT=null;drawWave();});
+
+/* ================= ربط الأحداث ================= */
+RC.addEventListener('mousemove',e=>{
+  const r=RC.getBoundingClientRect();
+  const t=pick(e.clientX-r.left,e.clientY-r.top);
+  if(t)showTip(t,e.clientX-r.left,e.clientY-r.top);else hideTip();
+});
+RC.addEventListener('mouseleave',hideTip);
+RC.addEventListener('click',e=>{
+  const r=RC.getBoundingClientRect();
+  const t=pick(e.clientX-r.left,e.clientY-r.top);
+  t?lockTarget(t):unlock();
+});
+RC.addEventListener('wheel',e=>{
+  e.preventDefault();
+  setGain(S.gain*(e.deltaY<0?1.08:1/1.08));
+},{passive:false});
+$('gPlus').onclick=()=>setGain(S.gain*1.15);
+$('gMinus').onclick=()=>setGain(S.gain/1.15);
+$('gReset').onclick=()=>setGain(1);
+$('btnSweep').onclick=()=>{
+  S.sweepOn=!S.sweepOn;
+  $('btnSweep').classList.toggle('active',S.sweepOn);
+  $('btnSweep').classList.toggle('paused',!S.sweepOn);
+  $('sweepLbl').textContent=S.sweepOn?'إيقاف المسح':'تشغيل المسح';
+};
+$('btnSpeed').onclick=()=>{
+  S.speedIdx=(S.speedIdx+1)%S.speeds.length;
+  const sp=S.speeds[S.speedIdx];
+  S.dps=360/sp.d; $('speedLbl').textContent=sp.l;
+  hint('سرعة المسح: '+sp.l);
+};
+$('btnSound').onclick=()=>{
+  S.sound=!S.sound; ensureAC();
+  $('btnSound').classList.toggle('muted',!S.sound);
+  if(S.sound)beep(700,1100,.12,.1);
+  hint(S.sound?'التنبيه الصوتي مفعّل':'التنبيه الصوتي معطّل');
+};
+$('btnSync').onclick=()=>sync(true);
+$('lkClose').onclick=unlock;
+$('pkgBtn').onclick=e=>{e.stopPropagation();$('pkg').hidden=!$('pkg').hidden;};
+$('pkgClose').onclick=()=>$('pkg').hidden=true;
+document.addEventListener('click',e=>{
+  if(!$('pkg').hidden&&!$('pkg').contains(e.target)&&e.target!==$('pkgBtn'))$('pkg').hidden=true;
+});
+
+/* ================= حزمة النشر ================= */
+function download(name,text){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download=name;a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function getIndexHTML(){
+  try{ const r=await fetch(location.href,{cache:'no-store'});
+    if(r.ok)return await r.text();
+  }catch(e){}
+  const c=document.documentElement.cloneNode(true);
+  const lg=c.querySelector('#log'); if(lg)lg.innerHTML='';
+  const tp=c.querySelector('#tip'); if(tp){tp.style.display='none';tp.innerHTML='';}
+  const lk=c.querySelector('#lock'); if(lk)lk.setAttribute('hidden','');
+  const bt=c.querySelector('#bootTag'); if(bt)bt.classList.remove('gone');
+  return '<!DOCTYPE html>\n'+c.outerHTML;
+}
+function readmeText(){
+  const yr=new Date().getFullYear();
+  return [
+'# FATYAK RADAR — منظومة رصد الأمواج الكهرومغناطيسية',
+'',
+'رادار برمجي حي يرصد الإشعاع الكهرومغناطيسي القادم من الشمس (الأشعة السينية الناعمة 0.5–4 Å و 1–8 Å التي تقيسها أقمار GOES التابعة لـ NOAA) إضافة إلى المؤشرات الجيومغناطيسية (المؤشر الكوكبي Kp والحقل المغناطيسي المداري Hp)، ويعرضها لحظياً على شاشة رادار PPI سمتية: الزاوية تمثل السمت الفعلي للمصدر (يُحسب سمت الشمس من التوقيت الحقيقي) والنصف القطر يمثل شدة الإشارة على مقياس لوغاريتمي.',
+'',
+'المطوّر: **FATYAK** — الإصدار 1.0.0',
+'',
+'## المزايا',
+'- شاشة رادار PPI حية بمسح دوراني واكتشاف أهداف مع حلقات صدمة وتنبيه صوتي اختياري.',
+'- كشف تلقائي للتوهجات الشمسية (A/B/C/M/X) وتصنيفها لحظياً، وتوليد أهداف تتبع عند تجاوز Kp = 4.',
+'- مخطط طيفي زمني للقناتين 1–8 Å و 0.5–4 Å مع محاور لوغاريتمية وتحليل بالتلميح (hover).',
+'- سجل رصد حي بطوابع زمنية UTC، ومقاييس رقمية: التدفق، Kp القوسي، الحقل المغناطيسي مع منحنى مصغر.',
+'- وضع محاكاة داخلي موسوم بوضوح (SIM) يعمل تلقائياً عند تعذر الوصول إلى مصدر البيانات.',
+'- ملف واحد بدون أي خطوات بناء (no build) — واجهة عربية RTL بهوية ألوان Ubuntu.',
+'',
+'## مصادر البيانات (عامة، بدون مفاتيح)',
+'- `https://services.swpc.noaa.gov/json/goes/primary/xrays-6-hour.json` — تدفق الأشعة السينية (GOES XRS).',
+'- `https://services.swpc.noaa.gov/json/planetary_k_index_1m.json` — المؤشر الكوكبي Kp (كل دقيقة).',
+'- `https://services.swpc.noaa.gov/json/goes/primary/magnetometers-1-day.json` — الحقل المغناطيسي المداري Hp.',
+'',
+'## التشغيل محلياً',
+'افتح `index.html` مباشرة في المتصفح (يلزم اتصال بالإنترنت لسحب بيانات NOAA).',
+'',
+'## النشر على GitHub Pages',
+'```bash',
+'git init',
+'git add index.html README.md LICENSE',
+'git commit -m "FATYAK RADAR v1.0.0"',
+'git branch -M main',
+'git remote add origin https://github.com/<حسابك>/fatyak-radar.git',
+'git push -u origin main',
+'```',
+'ثم من إعدادات المستودع: Settings ← Pages ← Branch: `main` / `root`.',
+'',
+'## ملاحظة علمية',
+'هذه المنظومة أداة رصد وعرض تعليمية لهواة مراقبة الفضاء، وليست بديلاً عن أنظمة الإنذار الرسمية الصادرة عن NOAA/NWS.',
+'',
+'## الرخصة',
+'MIT — Copyright (c) '+yr+' FATYAK'
+  ].join('\n');
+}
+function licenseText(){
+  const yr=new Date().getFullYear();
+  return 'MIT License\n\nCopyright (c) '+yr+' FATYAK\n\n'
++'Permission is hereby granted, free of charge, to any person obtaining a copy\n'
++'of this software and associated documentation files (the "Software"), to deal\n'
++'in the Software without restriction, including without limitation the rights\n'
++'to use, copy, modify, merge, publish, distribute, sublicense, and/or sell\n'
++'copies of the Software, and to permit persons to whom the Software is\n'
++'furnished to do so, subject to the following conditions:\n\n'
++'The above copyright notice and this permission notice shall be included in all\n'
++'copies or substantial portions of the Software.\n\n'
++'THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n'
++'IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n'
++'FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\n'
++'AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n'
++'LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n'
++'OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n'
++'SOFTWARE.\n';
+}
+document.querySelectorAll('.pkg-btns .btn').forEach(b=>{
+  b.addEventListener('click',async()=>{
+    const f=b.dataset.f;
+    if(f==='index')download('index.html',await getIndexHTML());
+    if(f==='readme')download('README.md',readmeText());
+    if(f==='license')download('LICENSE',licenseText());
+    hint('تم تحميل الملف — '+(f==='index'?'index.html':f==='readme'?'README.md':'LICENSE'));
+  });
+});
+
+/* ================= الساعة ================= */
+function tickClock(){
+  const d=new Date();
+  $('clock').textContent=utcHMS(d)+' UTC';
+  $('clockLocal').textContent=pad2(d.getHours())+':'+pad2(d.getMinutes())+' محلي';
+  updateSyncAge();
+}
+
+/* ================= الإقلاع ================= */
+function init(){
+  try{lucide.createIcons();}catch(e){}
+  $('yr').textContent=new Date().getFullYear();
+  sizeKp(); drawKp(null);
+  sizeRadar(); sizeWave(); drawWave();
+  setBadge(); tickClock();
+  log('تهيئة المنظومة — <b>FATYAK RADAR</b> v1.0.0','boot');
+  log('بناء شبكة المسح السمتية 360° × 6 عقود شدة … تم','boot');
+  log('الاتصال بمرصد الفضاء: NOAA SWPC / GOES-Primary …','net');
+  ensureSun(); refreshCounts();
+  requestAnimationFrame(t=>{lastT=t;requestAnimationFrame(frame);});
+  setInterval(tickClock,1000);
+  setInterval(()=>{refreshCounts();renderLock();},1000);
+  setInterval(()=>drawWave(),30000);
+  setTimeout(()=>sync(false),700);
+  setInterval(()=>sync(false),60000);
+  window.addEventListener('resize',()=>{sizeRadar();sizeWave();sizeSpark();drawSpark();drawWave();});
+  if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{buildBG();drawWave();});
+}
+init();
+</script>
+</body>
+</html>
